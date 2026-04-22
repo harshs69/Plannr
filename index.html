@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventBliss — Find & Book Event Vendors</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --gold-pale: #F5EDD0;
+    --cream: #FAF7F2;
+    --deep: #1A1208;
+    --brown: #3D2B1F;
+    --sage: #7A8C6E;
+    --blush: #E8C4C4;
+    --text: #2C1F14;
+    --muted: #7A6A58;
+    --border: rgba(201,168,76,0.25);
+    --shadow: 0 8px 40px rgba(26,18,8,0.12);
+    --shadow-lg: 0 20px 60px rgba(26,18,8,0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ─── UTILITY ─── */
+  .serif { font-family: 'Cormorant Garamond', serif; }
+  .gold { color: var(--gold); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--deep);
+    border: none;
+    padding: 13px 28px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.35);
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(201,168,76,0.5);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--gold);
+    border: 1.5px solid var(--gold);
+    padding: 11px 26px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .btn-outline:hover {
+    background: var(--gold);
+    color: var(--deep);
+  }
+  .tag {
+    display: inline-block;
+    background: var(--gold-pale);
+    color: var(--brown);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ─── NAVBAR ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(250,247,242,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--deep);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--gold); }
+  .nav-links {
+    display: flex; gap: 32px; list-style: none;
+  }
+  .nav-links a {
+    text-decoration: none; color: var(--muted);
+    font-size: 14px; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-actions { display: flex; gap: 10px; align-items: center; }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #1A1208 0%, #2C1F14 40%, #3D2B1F 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 5% 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,168,76,0.12) 0%, transparent 70%);
+  }
+  .hero-ornament {
+    position: absolute;
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 50%;
+  }
+  .hero-ornament.o1 { width: 600px; height: 600px; top: -150px; right: -150px; }
+  .hero-ornament.o2 { width: 400px; height: 400px; bottom: -100px; left: -100px; }
+  .hero-ornament.o3 { width: 200px; height: 200px; top: 20%; left: 10%; }
+  .hero-eyebrow {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(52px, 8vw, 100px);
+    font-weight: 300;
+    color: #FAF7F2;
+    line-height: 1.0;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold-light);
+    font-weight: 400;
+  }
+  .hero-sub {
+    color: rgba(250,247,242,0.6);
+    font-size: 16px;
+    max-width: 480px;
+    line-height: 1.7;
+    margin: 20px auto 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+  .hero-search {
+    background: rgba(250,247,242,0.08);
+    border: 1px solid rgba(201,168,76,0.3);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 24px 28px;
+    max-width: 720px; width: 100%;
+    display: flex; flex-wrap: wrap; gap: 12px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+  .hero-search select, .hero-search input {
+    flex: 1; min-width: 160px;
+    background: rgba(250,247,242,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #FAF7F2;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .hero-search select option { background: var(--deep); color: #FAF7F2; }
+  .hero-search select:focus, .hero-search input:focus { border-color: var(--gold); }
+  .hero-search input::placeholder { color: rgba(250,247,242,0.4); }
+  .hero-stats {
+    display: flex; gap: 40px; margin-top: 60px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 1s forwards;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px; font-weight: 600;
+    color: var(--gold-light);
+    display: block;
+  }
+  .stat-lbl { font-size: 12px; color: rgba(250,247,242,0.5); letter-spacing: 1px; text-transform: uppercase; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SERVICES SECTION ─── */
+  .section { padding: 80px 5%; }
+  .section-header { text-align: center; margin-bottom: 52px; }
+  .section-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 300;
+    color: var(--deep);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .section-header h2 em { font-style: italic; color: var(--gold); }
+  .section-header p { color: var(--muted); margin-top: 12px; font-size: 15px; }
+  .divider-ornament {
+    display: flex; align-items: center; gap: 12px;
+    justify-content: center; margin: 16px 0;
+  }
+  .divider-ornament::before, .divider-ornament::after {
+    content: '';
+    flex: 1; max-width: 80px; height: 1px; background: var(--border);
+  }
+  .divider-ornament span { color: var(--gold); font-size: 18px; }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 16px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .service-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+  .service-card:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: var(--shadow); }
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-card.active { border-color: var(--gold); background: var(--gold-pale); }
+  .service-icon { font-size: 32px; display: block; margin-bottom: 10px; }
+  .service-card h4 { font-size: 13px; font-weight: 600; color: var(--deep); }
+  .service-card p { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ─── VENDORS SECTION ─── */
+  .vendors-section { background: white; padding: 80px 5%; }
+  .filters-bar {
+    display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 36px;
+    align-items: center;
+  }
+  .filters-bar label { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .filter-select {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    transition: border 0.2s;
+  }
+  .filter-select:focus { border-color: var(--gold); }
+  .filter-input {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    flex: 1; min-width: 200px;
+    transition: border 0.2s;
+  }
+  .filter-input:focus { border-color: var(--gold); }
+  .results-count { margin-left: auto; font-size: 13px; color: var(--muted); }
+
+  .vendors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .vendor-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .vendor-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+  .vendor-card-img {
+    height: 160px;
+    background: linear-gradient(135deg, var(--deep), var(--brown));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px;
+    position: relative;
+    overflow: hidden;
+  }
+  .vendor-badge {
+    position: absolute; top: 12px; right: 12px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--deep);
+    font-size: 10px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .vendor-card-body { padding: 20px; }
+  .vendor-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 600;
+    color: var(--deep); margin-bottom: 4px;
+  }
+  .vendor-service { font-size: 12px; color: var(--gold); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+  .vendor-meta { display: flex; gap: 16px; margin: 12px 0; }
+  .vendor-meta span { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+  .vendor-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+  .vendor-footer { display: flex; align-items: center; justify-content: space-between; }
+  .vendor-price { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--deep); }
+  .vendor-price span { font-family: 'DM Sans'; font-size: 11px; color: var(--muted); font-weight: 400; }
+  .stars { color: var(--gold); font-size: 13px; }
+  .no-results {
+    text-align: center; padding: 60px 20px; color: var(--muted);
+    grid-column: 1/-1;
+  }
+  .no-results .nr-icon { font-size: 48px; display: block; margin-bottom: 12px; }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(26,18,8,0.7);
+    backdrop-filter: blur(8px);
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 24px;
+    max-width: 620px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: scaleIn 0.3s ease;
+  }
+  @keyframes scaleIn {
+    from { transform: scale(0.92); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .modal-header {
+    padding: 28px 28px 0;
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .modal-close {
+    background: var(--cream); border: none;
+    width: 36px; height: 36px; border-radius: 50%;
+    cursor: pointer; font-size: 18px; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .modal-close:hover { background: var(--border); color: var(--deep); }
+  .modal-body { padding: 20px 28px 28px; }
+  .modal-vendor-icon { font-size: 64px; text-align: center; margin-bottom: 16px; }
+  .modal-vendor-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px; font-weight: 600; color: var(--deep);
+    text-align: center;
+  }
+  .modal-service { text-align: center; color: var(--gold); font-weight: 600; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin: 6px 0 20px; }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .contact-item {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .contact-icon { font-size: 20px; }
+  .contact-label { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+  .contact-value { font-size: 13px; color: var(--deep); font-weight: 500; margin-top: 2px; }
+  .packages { margin-top: 20px; }
+  .packages h4 { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--deep); margin-bottom: 12px; }
+  .package-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px;
+    border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 8px;
+    background: var(--cream);
+  }
+  .package-name { font-size: 14px; font-weight: 500; color: var(--deep); }
+  .package-price { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--gold); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+  .modal-actions .btn-primary, .modal-actions .btn-outline { flex: 1; text-align: center; }
+
+  /* ─── REGISTER SECTION ─── */
+  .register-section {
+    background: linear-gradient(160deg, var(--deep) 0%, var(--brown) 100%);
+    padding: 80px 5%;
+    position: relative; overflow: hidden;
+  }
+  .register-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(201,168,76,0.1) 0%, transparent 70%);
+  }
+  .register-container {
+    max-width: 800px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+    align-items: start;
+    position: relative; z-index: 1;
+  }
+  .register-left h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px; font-weight: 300; color: #FAF7F2;
+    line-height: 1.1; margin-bottom: 16px;
+  }
+  .register-left h2 em { font-style: italic; color: var(--gold-light); }
+  .register-left p { color: rgba(250,247,242,0.6); font-size: 14px; line-height: 1.7; margin-bottom: 24px; }
+  .perks { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .perks li { color: rgba(250,247,242,0.7); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .perks li::before { content: '✦'; color: var(--gold); font-size: 10px; }
+
+  .register-form {
+    background: rgba(250,247,242,0.06);
+    border: 1px solid rgba(201,168,76,0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px; padding: 28px;
+  }
+  .form-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px; color: #FAF7F2; margin-bottom: 20px; font-weight: 600;
+  }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: rgba(250,247,242,0.6); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    background: rgba(250,247,242,0.08);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px; padding: 11px 14px;
+    color: #FAF7F2;
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    outline: none; transition: border 0.2s;
+    resize: none;
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(250,247,242,0.3); }
+  .form-group select option { background: var(--deep); }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .services-check { display: flex; flex-wrap: wrap; gap: 8px; }
+  .services-check label {
+    background: rgba(250,247,242,0.06);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 20px; padding: 6px 12px;
+    font-size: 12px; color: rgba(250,247,242,0.7);
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+    text-transform: none; letter-spacing: 0;
+  }
+  .services-check input { display: none; }
+  .services-check label:has(input:checked) { background: rgba(201,168,76,0.2); border-color: var(--gold); color: var(--gold-light); }
+  .form-success {
+    display: none; text-align: center; padding: 20px;
+  }
+  .form-success .success-icon { font-size: 52px; display: block; margin-bottom: 12px; }
+  .form-success h3 { font-family: 'Cormorant Garamond', serif; font-size: 26px; color: var(--gold-light); margin-bottom: 8px; }
+  .form-success p { color: rgba(250,247,242,0.6); font-size: 14px; }
+
+  /* ─── HOW IT WORKS ─── */
+  .how-section { padding: 80px 5%; background: var(--gold-pale); }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; max-width: 960px; margin: 0 auto; }
+  .step { text-align: center; }
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 56px; font-weight: 700; color: var(--gold);
+    line-height: 1; margin-bottom: 12px; opacity: 0.5;
+  }
+  .step h4 { font-size: 16px; font-weight: 600; color: var(--deep); margin-bottom: 8px; }
+  .step p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--deep); color: rgba(250,247,242,0.6);
+    padding: 48px 5% 24px;
+  }
+  .footer-top { display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between; margin-bottom: 40px; }
+  .footer-brand .logo { color: #FAF7F2; font-size: 28px; display: block; margin-bottom: 10px; }
+  .footer-brand p { font-size: 13px; max-width: 260px; line-height: 1.7; }
+  .footer-col h5 { font-weight: 600; color: #FAF7F2; margin-bottom: 16px; font-size: 14px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .footer-col ul li { font-size: 13px; }
+  .footer-col ul li a { color: rgba(250,247,242,0.6); text-decoration: none; transition: color 0.2s; }
+  .footer-col ul li a:hover { color: var(--gold); }
+  .footer-bottom { border-top: 1px solid rgba(201,168,76,0.1); padding-top: 20px; text-align: center; font-size: 12px; }
+
+  /* ─── TABS ─── */
+  .tabs { display: flex; gap: 4px; background: var(--cream); border: 1px solid var(--border); border-radius: 12px; padding: 4px; margin-bottom: 32px; width: fit-content; }
+  .tab-btn {
+    padding: 9px 20px; border-radius: 9px; border: none;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; background: transparent; color: var(--muted);
+  }
+  .tab-btn.active { background: white; color: var(--deep); font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 3000;
+    background: var(--deep); color: #FAF7F2;
+    padding: 14px 20px; border-radius: 12px;
+    font-size: 14px; box-shadow: var(--shadow-lg);
+    display: flex; align-items: center; gap: 10px;
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.4s ease;
+    border-left: 3px solid var(--gold);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .register-container { grid-template-columns: 1fr; gap: 32px; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .hero-stats { gap: 24px; }
+    .stat-num { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Event<span>Bliss</span></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#vendors">Find Vendors</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#register">For Vendors</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="btn-outline" onclick="scrollToSection('register')">List Your Business</button>
+    <button class="btn-primary" onclick="scrollToSection('vendors')">Find Vendors</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-ornament o1"></div>
+  <div class="hero-ornament o2"></div>
+  <div class="hero-ornament o3"></div>
+  <p class="hero-eyebrow">India's Premier Event Marketplace</p>
+  <h1>Every Moment<br>Deserves to be <em>Perfect</em></h1>
+  <p class="hero-sub">Discover trusted vendors for weddings, birthdays, anniversaries & every celebration in between.</p>
+  <div class="hero-search">
+    <select id="heroService">
+      <option value="">All Services</option>
+      <option>Catering & Food</option>
+      <option>Decoration & Florals</option>
+      <option>Marriage Halls / Venues</option>
+      <option>Music & Orchestra</option>
+      <option>Photography & Video</option>
+      <option>Bridal Makeup & Beauty</option>
+      <option>Wedding Cards & Invites</option>
+      <option>DJ & Sound Systems</option>
+      <option>Mehendi Artists</option>
+      <option>Horse & Buggy / Baraat</option>
+      <option>Tent & Furniture Rental</option>
+      <option>Wedding Cakes & Sweets</option>
+      <option>Transportation & Limousines</option>
+      <option>Event Management</option>
+    </select>
+    <select id="heroCity">
+      <option value="">Select City</option>
+      <option>Bengaluru</option>
+      <option>Mumbai</option>
+      <option>Delhi</option>
+      <option>Hyderabad</option>
+      <option>Chennai</option>
+      <option>Pune</option>
+      <option>Kolkata</option>
+      <option>Ahmedabad</option>
+      <option>Jaipur</option>
+      <option>Chandigarh</option>
+    </select>
+    <button class="btn-primary" onclick="heroSearch()" style="flex-shrink:0">🔍 Search Vendors</button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num">2,400+</span><span class="stat-lbl">Verified Vendors</span></div>
+    <div class="stat"><span class="stat-num">18K+</span><span class="stat-lbl">Events Planned</span></div>
+    <div class="stat"><span class="stat-num">24</span><span class="stat-lbl">Cities Covered</span></div>
+    <div class="stat"><span class="stat-num">4.8★</span><span class="stat-lbl">Avg. Rating</span></div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="section-header">
+    <div class="tag">Browse by Category</div>
+    <h2 style="margin-top:12px">Everything for Your <em>Special Day</em></h2>
+    <div class="divider-ornament"><span>✦</span></div>
+    <p>Click a category to filter vendors instantly</p>
+  </div>
+  <div class="services-grid" id="servicesGrid">
+    <!-- populated by JS -->
+  </div>
+</section>
+
+<!-- VENDORS -->
+<section class="vendors-section" id="vendors">
+  <div class="section-header">
+    <div class="tag">Discover</div>
+    <h2 style="margin-top:12px">Featured <em>Vendors</em></h2>
+    <div class="divider-ornament"><span>✦</span></div>
+  </div>
+
+  <div class="filters-bar">
+    <label>Filter:</label>
+    <select class="filter-select" id="filterService" onchange="applyFilters()">
+      <option value="">All Services</option>
+    </select>
+    <select class="filter-select" id="filterCity" onchange="applyFilters()">
+      <option value="">All Cities</option>
+      <option>Bengaluru</option>
+      <option>Mumbai</option>
+      <option>Delhi</option>
+      <option>Hyderabad</option>
+      <option>Chennai</option>
+      <option>Pune</option>
+      <option>Kolkata</option>
+      <option>Jaipur</option>
+    </select>
+    <select class="filter-select" id="filterEvent" onchange="applyFilters()">
+      <option value="">All Events</option>
+      <option>Wedding</option>
+      <option>Birthday</option>
+      <option>Anniversary</option>
+      <option>Corporate</option>
+      <option>Baby Shower</option>
+      <option>Engagement</option>
+    </select>
+    <input class="filter-input" id="filterSearch" placeholder="🔍  Search vendor name..." oninput="applyFilters()">
+    <span class="results-count" id="resultsCount"></span>
+  </div>
+
+  <div class="vendors-grid" id="vendorsGrid"></div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-header">
+    <div class="tag">Simple Process</div>
+    <h2 style="margin-top:12px">How <em>EventBliss</em> Works</h2>
+    <div class="divider-ornament"><span>✦</span></div>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h4>Search & Filter</h4>
+      <p>Browse hundreds of vendors by service type, city, budget, and event type to find your perfect match.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h4>View Profiles</h4>
+      <p>Explore detailed vendor profiles with photos, packages, pricing, reviews, and full contact information.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h4>Connect Directly</h4>
+      <p>Call, WhatsApp, or email the vendor directly — no middlemen, no hidden booking fees.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <h4>Celebrate Blissfully</h4>
+      <p>Relax knowing your event is in the hands of vetted, reviewed professionals you can trust.</p>
+    </div>
+  </div>
+</section>
+
+<!-- REGISTER VENDOR -->
+<section class="register-section" id="register">
+  <div class="register-container">
+    <div class="register-left">
+      <h2>Grow Your Business with <em>EventBliss</em></h2>
+      <p>Join India's fastest-growing event marketplace and connect with thousands of event planners and families looking for trusted vendors like you.</p>
+      <ul class="perks">
+        <li>Free listing with your full contact details</li>
+        <li>Reach customers in your city & nearby areas</li>
+        <li>Showcase multiple services & packages</li>
+        <li>Receive direct calls, WhatsApp & email enquiries</li>
+        <li>Build your reputation with verified reviews</li>
+        <li>Featured placement for top-rated vendors</li>
+      </ul>
+    </div>
+    <div class="register-form">
+      <div class="form-title">Register as a Vendor</div>
+      <div id="vendorFormContent">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Business Name *</label>
+            <input type="text" id="bizName" placeholder="e.g. Royal Caterers" required>
+          </div>
+          <div class="form-group">
+            <label>Owner Name *</label>
+            <input type="text" id="ownerName" placeholder="Your full name" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone / WhatsApp *</label>
+            <input type="tel" id="phone" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" id="email" placeholder="you@example.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City *</label>
+            <select id="regCity" required>
+              <option value="">Select City</option>
+              <option>Bengaluru</option>
+              <option>Mumbai</option>
+              <option>Delhi</option>
+              <option>Hyderabad</option>
+              <option>Chennai</option>
+              <option>Pune</option>
+              <option>Kolkata</option>
+              <option>Ahmedabad</option>
+              <option>Jaipur</option>
+              <option>Chandigarh</option>
+              <option>Surat</option>
+              <option>Lucknow</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Area / Locality</label>
+            <input type="text" id="area" placeholder="e.g. Koramangala">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Primary Service *</label>
+          <select id="primaryService" required>
+            <option value="">Select your main service</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Services Offered</label>
+          <div class="services-check" id="serviceCheckboxes"></div>
+        </div>
+        <div class="form-group">
+          <label>Starting Price (₹)</label>
+          <input type="text" id="startPrice" placeholder="e.g. 25,000">
+        </div>
+        <div class="form-group">
+          <label>Business Description</label>
+          <textarea id="bizDesc" rows="3" placeholder="Tell customers about your services, experience, and speciality..."></textarea>
+        </div>
+        <button class="btn-primary" style="width:100%;margin-top:8px;padding:14px" onclick="registerVendor()">✦ Register My Business</button>
+      </div>
+      <div class="form-success" id="formSuccess">
+        <span class="success-icon">🎉</span>
+        <h3>You're Listed!</h3>
+        <p>Your business has been registered. Our team will verify and activate your listing within 24 hours. Check your email for confirmation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <span class="logo">Event<span style="color:var(--gold)">Bliss</span></span>
+      <p>India's most trusted marketplace to discover, connect, and book event vendors for every celebration.</p>
+    </div>
+    <div class="footer-col">
+      <h5>For Customers</h5>
+      <ul>
+        <li><a href="#">Find Vendors</a></li>
+        <li><a href="#">Wedding Planning Guide</a></li>
+        <li><a href="#">Budget Calculator</a></li>
+        <li><a href="#">Reviews & Ratings</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>For Vendors</h5>
+      <ul>
+        <li><a href="#">Register Your Business</a></li>
+        <li><a href="#">Vendor Dashboard</a></li>
+        <li><a href="#">Pricing Plans</a></li>
+        <li><a href="#">Success Stories</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 EventBliss. Made with ✦ in India. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<!-- VENDOR DETAIL MODAL -->
+<div class="modal-overlay" id="vendorModal">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span>✦</span>
+  <span id="toastMsg">Action completed!</span>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const SERVICES = [
+  { icon:'🍽️', name:'Catering & Food', desc:'Buffets, thalis, live counters' },
+  { icon:'💐', name:'Decoration & Florals', desc:'Stage, mandap, floral arrangements' },
+  { icon:'🏛️', name:'Venues & Halls', desc:'Banquets, gardens, lawns' },
+  { icon:'🎵', name:'Music & Orchestra', desc:'Live bands, classical music' },
+  { icon:'📸', name:'Photography', desc:'Wedding & event photography' },
+  { icon:'🎬', name:'Videography', desc:'Cinematic wedding films' },
+  { icon:'💄', name:'Bridal Makeup', desc:'Bridal & party makeup' },
+  { icon:'🎤', name:'DJ & Sound', desc:'DJ, PA systems, lighting' },
+  { icon:'🌿', name:'Mehendi Artists', desc:'Bridal & party mehendi' },
+  { icon:'🐴', name:'Baraat & Ghodi', desc:'Horse, Dhol, procession' },
+  { icon:'⛺', name:'Tent & Furniture', desc:'Tents, tables, chairs, decor' },
+  { icon:'🎂', name:'Cakes & Sweets', desc:'Wedding & custom cakes' },
+  { icon:'💌', name:'Invitations & Cards', desc:'Printed & digital invites' },
+  { icon:'🚗', name:'Transportation', desc:'Cars, buses, limousines' },
+  { icon:'🎆', name:'Fireworks & Effects', desc:'Pyrotechnics, confetti, fog' },
+  { icon:'👗', name:'Bridal Wear', desc:'Lehengas, sarees, sherwanis' },
+  { icon:'💍', name:'Jewellery Rental', desc:'Bridal jewellery on rent' },
+  { icon:'🎠', name:'Kids Entertainment', desc:'Clowns, games, rides' },
+  { icon:'🕌', name:'Pandit / Priest', desc:'Vedic ceremonies & rituals' },
+  { icon:'🎞️', name:'Photo Booth', desc:'Fun props & instant prints' },
+  { icon:'🌐', name:'Event Management', desc:'Full-service planners' },
+  { icon:'🍰', name:'Corporate Events', desc:'Conferences, team events' },
+];
+
+const VENDORS = [
+  { id:1, name:'Royal Spice Caterers', service:'Catering & Food', city:'Bengaluru', area:'Koramangala', events:['Wedding','Birthday','Corporate'], rating:4.9, reviews:284, price:'₹850/plate', minPrice:50000, desc:'Award-winning caterers with 18 years of experience. Specialists in South Indian, North Indian, and Continental spreads. Live counters available.', icon:'🍽️', phone:'+91 98445 12345', email:'royal@spicecatering.in', whatsapp:'+91 98445 12345', website:'royalspicecatering.in', featured:true, packages:[{name:'Silver Package (up to 200 guests)',price:'₹1.2 Lakh'},{name:'Gold Package (up to 500 guests)',price:'₹2.8 Lakh'},{name:'Platinum (Unlimited guests)',price:'₹5 Lakh+'}] },
+  { id:2, name:'Blooming Occasions', service:'Decoration & Florals', city:'Mumbai', area:'Andheri', events:['Wedding','Anniversary','Engagement'], rating:4.8, reviews:196, price:'From ₹45K', minPrice:45000, desc:'Transforming venues into breathtaking floral wonderlands. Specialising in roses, orchids, and marigold theme weddings. Customised mandap designs.', icon:'💐', phone:'+91 99201 87654', email:'info@blooming.in', whatsapp:'+91 99201 87654', website:'blooming.in', featured:true, packages:[{name:'Basic Floral Stage',price:'₹45,000'},{name:'Full Venue Decoration',price:'₹1.5 Lakh'},{name:'Destination Wedding Package',price:'₹3 Lakh+'}] },
+  { id:3, name:'Goldleaf Garden Palace', service:'Venues & Halls', city:'Hyderabad', area:'Banjara Hills', events:['Wedding','Corporate','Birthday'], rating:4.7, reviews:312, price:'₹3L/day', minPrice:300000, desc:'A magnificent 5-acre lawn and banquet complex with AC halls, outdoor lawns, and state-of-the-art kitchen. Capacity up to 1500 guests.', icon:'🏛️', phone:'+91 40-4567 8901', email:'bookings@goldleafpalace.in', whatsapp:'+91 98489 00123', website:'goldleafpalace.in', featured:true, packages:[{name:'Banquet Hall (up to 300)',price:'₹1.5 Lakh/day'},{name:'Outdoor Lawn (up to 800)',price:'₹2.5 Lakh/day'},{name:'Full Complex',price:'₹4.5 Lakh/day'}] },
+  { id:4, name:'Rhythm & Beats Orchestra', service:'Music & Orchestra', city:'Delhi', area:'Lajpat Nagar', events:['Wedding','Anniversary','Birthday'], rating:4.9, reviews:157, price:'From ₹35K', minPrice:35000, desc:'15-member live orchestra performing Bollywood, Punjabi, and classical music. Professional audio-visual setup included. Available pan-India.', icon:'🎵', phone:'+91 98100 55566', email:'rhythm@beatsorchestra.in', whatsapp:'+91 98100 55566', website:'rhythmbeats.in', featured:false, packages:[{name:'5-piece Band (3 hrs)',price:'₹35,000'},{name:'Full Orchestra (5 hrs)',price:'₹75,000'},{name:'Celebrity Night Package',price:'₹1.5 Lakh'}] },
+  { id:5, name:'Lens & Love Photography', service:'Photography', city:'Bengaluru', area:'Jayanagar', events:['Wedding','Engagement','Pre-wedding'], rating:5.0, reviews:228, price:'From ₹40K', minPrice:40000, desc:'Cinematic wedding storytellers. Full-day candid photography with drone shoots, album design, and international style editing included.', icon:'📸', phone:'+91 99001 77788', email:'hello@lensandlove.in', whatsapp:'+91 99001 77788', website:'lensandlove.in', featured:true, packages:[{name:'Basic (8 hrs, 300 photos)',price:'₹40,000'},{name:'Premium (Full day + Drone)',price:'₹85,000'},{name:'Luxury (2 days + Album)',price:'₹1.6 Lakh'}] },
+  { id:6, name:'Shringar Bridal Studio', service:'Bridal Makeup', city:'Pune', area:'Kothrud', events:['Wedding','Engagement','Birthday'], rating:4.8, reviews:189, price:'From ₹8K', minPrice:8000, desc:'Certified MAC & Airbrush makeup artists. Bridal trousseau packages with hair, makeup, saree draping, and pre-bridal treatments available.', icon:'💄', phone:'+91 98220 34567', email:'shringar@bridalstudio.in', whatsapp:'+91 98220 34567', website:'shringarbridals.in', featured:false, packages:[{name:'Basic Bridal Makeup',price:'₹8,000'},{name:'Airbrush Bridal Package',price:'₹18,000'},{name:'Complete Bridal Trousseau',price:'₹45,000'}] },
+  { id:7, name:'Bass Drop DJs', service:'DJ & Sound', city:'Mumbai', area:'Bandra', events:['Wedding','Birthday','Corporate'], rating:4.7, reviews:143, price:'From ₹20K', minPrice:20000, desc:'Mumbai\'s most sought-after DJ crew. High-end sound systems, LED lighting rigs, and fog machines. Bollywood, EDM, and Retro specialists.', icon:'🎤', phone:'+91 98765 99001', email:'dj@bassdropevents.in', whatsapp:'+91 98765 99001', website:'bassdrop.in', featured:false, packages:[{name:'DJ + Basic Sound (4 hrs)',price:'₹20,000'},{name:'DJ + Full Sound + Lighting',price:'₹45,000'},{name:'Production Setup (LED Wall)',price:'₹90,000'}] },
+  { id:8, name:'Henna Art by Noor', service:'Mehendi Artists', city:'Jaipur', area:'C-Scheme', events:['Wedding','Engagement','Baby Shower'], rating:4.9, reviews:312, price:'From ₹5K', minPrice:5000, desc:'Specialising in bridal Rajasthani and Arabic mehendi patterns. Pan-India travel available. 12+ years of experience with celebrity clientele.', icon:'🌿', phone:'+91 98290 12233', email:'noor@hennaart.in', whatsapp:'+91 98290 12233', website:'hennaartbynoor.in', featured:true, packages:[{name:'Bridal Mehendi (both hands)',price:'₹5,000'},{name:'Full Bridal Package (hands+feet)',price:'₹9,500'},{name:'Party Mehendi (per guest)',price:'₹500/person'}] },
+  { id:9, name:'Bliss Bakers', service:'Cakes & Sweets', city:'Chennai', area:'Anna Nagar', events:['Wedding','Birthday','Anniversary'], rating:4.8, reviews:267, price:'From ₹3K', minPrice:3000, desc:'Customised tiered wedding cakes, theme birthday cakes, and traditional sweets boxes. Eggless options available. Pan-Tamil Nadu delivery.', icon:'🎂', phone:'+91 98401 23456', email:'orders@blissbakers.in', whatsapp:'+91 98401 23456', website:'blissbakers.in', featured:false, packages:[{name:'2-tier Custom Cake (2 kg)',price:'₹3,500'},{name:'5-tier Wedding Cake',price:'₹18,000'},{name:'Sweet Boxes (per 50)',price:'₹4,000'}] },
+  { id:10, name:'Grand Celebrations Events', service:'Event Management', city:'Bengaluru', area:'Indiranagar', events:['Wedding','Corporate','Birthday'], rating:4.9, reviews:98, price:'From ₹80K', minPrice:80000, desc:'Full-service event management company handling vendor coordination, décor, catering, entertainment, and day-of coordination for seamless events.', icon:'🌐', phone:'+91 80-4012 3456', email:'plan@grandcelebrations.in', whatsapp:'+91 98867 45678', website:'grandcelebrations.in', featured:true, packages:[{name:'Coordination Only',price:'₹80,000'},{name:'Full Wedding Package',price:'₹3.5 Lakh'},{name:'Destination Wedding',price:'₹8 Lakh+'}] },
+  { id:11, name:'Fireworks India', service:'Fireworks & Effects', city:'Delhi', area:'Dwarka', events:['Wedding','Birthday'], rating:4.6, reviews:74, price:'From ₹15K', minPrice:15000, desc:'Licensed pyrotechnics company with safe and spectacular fireworks shows. Cold pyro, confetti cannons, and drone light shows available.', icon:'🎆', phone:'+91 98111 22334', email:'shows@fireworksindia.in', whatsapp:'+91 98111 22334', website:'fireworksindia.in', featured:false, packages:[{name:'Cold Pyro Package (10 mins)',price:'₹15,000'},{name:'Full Fireworks Show',price:'₹45,000'},{name:'Drone Light Show',price:'₹1.5 Lakh'}] },
+  { id:12, name:'Shree Pandits Bureau', service:'Pandit / Priest', city:'Hyderabad', area:'Secunderabad', events:['Wedding','Engagement','Housewarming'], rating:5.0, reviews:512, price:'From ₹5K', minPrice:5000, desc:'Experienced Vedic priests conducting marriages, griha pravesh, namkaran, satyanarayan puja, and more. Bilingual (Sanskrit + Telugu/Hindi).', icon:'🕌', phone:'+91 98480 55667', email:'pandit@shreepandits.in', whatsapp:'+91 98480 55667', website:'shreepandits.in', featured:false, packages:[{name:'Basic Puja (2 hrs)',price:'₹5,000'},{name:'Full Wedding Ceremony',price:'₹18,000'},{name:'Multi-day Ceremonies',price:'₹35,000+'}] },
+];
+
+// ── INIT ──────────────────────────────────────────────────────
+let activeService = '';
+
+function init() {
+  renderServiceCards();
+  renderVendors(VENDORS);
+  populateFilterDropdown();
+  populateRegisterForm();
+  updateResultsCount(VENDORS.length);
+}
+
+function renderServiceCards() {
+  const grid = document.getElementById('servicesGrid');
+  grid.innerHTML = SERVICES.map(s => `
+    <div class="service-card" onclick="filterByService('${s.name}')" id="sc_${s.name.replace(/\W/g,'_')}">
+      <span class="service-icon">${s.icon}</span>
+      <h4>${s.name}</h4>
+      <p>${s.desc}</p>
+    </div>
+  `).join('') + `<div class="service-card" onclick="filterByService('')" style="border-style:dashed">
+    <span class="service-icon">✦</span>
+    <h4>All Services</h4>
+    <p>See all vendors</p>
+  </div>`;
+}
+
+function filterByService(name) {
+  activeService = name;
+  document.querySelectorAll('.service-card').forEach(c => c.classList.remove('active'));
+  if (name) {
+    const id = 'sc_' + name.replace(/\W/g,'_');
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+    document.getElementById('filterService').value = name;
+  } else {
+    document.getElementById('filterService').value = '';
+  }
+  applyFilters();
+  scrollToSection('vendors');
+}
+
+function populateFilterDropdown() {
+  const sel = document.getElementById('filterService');
+  const primarySel = document.getElementById('primaryService');
+  SERVICES.forEach(s => {
+    sel.innerHTML += `<option value="${s.name}">${s.icon} ${s.name}</option>`;
+    primarySel.innerHTML += `<option value="${s.name}">${s.icon} ${s.name}</option>`;
+  });
+}
+
+function populateRegisterForm() {
+  const chk = document.getElementById('serviceCheckboxes');
+  chk.innerHTML = SERVICES.map(s =>
+    `<label><input type="checkbox" value="${s.name}"> ${s.icon} ${s.name}</label>`
+  ).join('');
+}
+
+function renderVendors(vendors) {
+  const grid = document.getElementById('vendorsGrid');
+  if (!vendors.length) {
+    grid.innerHTML = `<div class="no-results"><span class="nr-icon">🔍</span><strong>No vendors found</strong><br>Try adjusting your filters or search query.</div>`;
+    return;
+  }
+  grid.innerHTML = vendors.map(v => `
+    <div class="vendor-card" onclick="openVendor(${v.id})">
+      <div class="vendor-card-img">
+        ${v.icon}
+        ${v.featured ? '<span class="vendor-badge">✦ Featured</span>' : ''}
+      </div>
+      <div class="vendor-card-body">
+        <div class="vendor-service">${v.service}</div>
+        <div class="vendor-name">${v.name}</div>
+        <div class="vendor-meta">
+          <span>📍 ${v.city}, ${v.area}</span>
+          <span class="stars">${'★'.repeat(Math.floor(v.rating))} ${v.rating}</span>
+          <span>(${v.reviews})</span>
+        </div>
+        <div class="vendor-desc">${v.desc.substring(0,90)}...</div>
+        <div class="vendor-footer">
+          <div class="vendor-price">${v.price}<br><span>starting price</span></div>
+          <button class="btn-primary" style="padding:9px 18px;font-size:13px">View Details</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function applyFilters() {
+  const service = document.getElementById('filterService').value;
+  const city = document.getElementById('filterCity').value;
+  const event = document.getElementById('filterEvent').value;
+  const search = document.getElementById('filterSearch').value.toLowerCase();
+
+  let filtered = VENDORS.filter(v => {
+    if (service && v.service !== service) return false;
+    if (city && v.city !== city) return false;
+    if (event && !v.events.includes(event)) return false;
+    if (search && !v.name.toLowerCase().includes(search) && !v.desc.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  renderVendors(filtered);
+  updateResultsCount(filtered.length);
+}
+
+function updateResultsCount(n) {
+  document.getElementById('resultsCount').textContent = `${n} vendor${n!==1?'s':''} found`;
+}
+
+function openVendor(id) {
+  const v = VENDORS.find(x => x.id === id);
+  if (!v) return;
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <div class="modal-header">
+      <div>
+        <span class="tag">${v.service}</span>
+        ${v.featured ? '<span class="tag" style="margin-left:8px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--deep)">✦ Featured</span>' : ''}
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-vendor-icon">${v.icon}</div>
+      <div class="modal-vendor-name">${v.name}</div>
+      <div class="modal-service">${v.service}</div>
+      <div style="text-align:center;margin-bottom:16px">
+        <span class="stars">${'★'.repeat(Math.floor(v.rating))}${v.rating%1?'½':''}</span>
+        <span style="font-size:14px;font-weight:600;color:var(--deep)"> ${v.rating}</span>
+        <span style="font-size:13px;color:var(--muted)"> (${v.reviews} reviews)</span>
+      </div>
+      <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px">${v.desc}</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+        ${v.events.map(e=>`<span class="tag">${e}</span>`).join('')}
+        <span class="tag">📍 ${v.city}, ${v.area}</span>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-item">
+          <span class="contact-icon">📞</span>
+          <div>
+            <div class="contact-label">Phone</div>
+            <div class="contact-value">${v.phone}</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">✉️</span>
+          <div>
+            <div class="contact-label">Email</div>
+            <div class="contact-value">${v.email}</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">💬</span>
+          <div>
+            <div class="contact-label">WhatsApp</div>
+            <div class="contact-value">${v.whatsapp}</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">🌐</span>
+          <div>
+            <div class="contact-label">Website</div>
+            <div class="contact-value">${v.website}</div>
+          </div>
+        </div>
+      </div>
+      ${v.packages ? `
+      <div class="packages">
+        <h4>Packages & Pricing</h4>
+        ${v.packages.map(p=>`
+          <div class="package-item">
+            <span class="package-name">${p.name}</span>
+            <span class="package-price">${p.price}</span>
+          </div>
+        `).join('')}
+      </div>
+      ` : ''}
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="contactAction('call','${v.phone}','${v.name}')">📞 Call Now</button>
+        <button class="btn-primary" onclick="contactAction('whatsapp','${v.whatsapp}','${v.name}')" style="background:linear-gradient(135deg,#25D366,#128C7E)">💬 WhatsApp</button>
+        <button class="btn-outline" onclick="contactAction('email','${v.email}','${v.name}')">✉️ Email</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('vendorModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('vendorModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('vendorModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function contactAction(type, value, name) {
+  if (type === 'call') {
+    window.location.href = `tel:${value.replace(/\s/g,'')}`;
+    showToast(`📞 Calling ${name}...`);
+  } else if (type === 'whatsapp') {
+    const msg = encodeURIComponent(`Hi! I found you on EventBliss and I'm interested in your services for my event. Could you please share more details?`);
+    window.open(`https://wa.me/${value.replace(/\D/g,'')}?text=${msg}`, '_blank');
+  } else if (type === 'email') {
+    window.location.href = `mailto:${value}?subject=Event Enquiry via EventBliss&body=Hi, I found you on EventBliss and am interested in your services.`;
+    showToast(`✉️ Opening email to ${name}...`);
+  }
+}
+
+function registerVendor() {
+  const name = document.getElementById('bizName').value.trim();
+  const owner = document.getElementById('ownerName').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const city = document.getElementById('regCity').value;
+  const service = document.getElementById('primaryService').value;
+
+  if (!name || !owner || !phone || !email || !city || !service) {
+    showToast('⚠️ Please fill in all required fields.');
+    return;
+  }
+  document.getElementById('vendorFormContent').style.display = 'none';
+  document.getElementById('formSuccess').style.display = 'block';
+  showToast('🎉 Registration successful! Welcome to EventBliss.');
+}
+
+function heroSearch() {
+  const service = document.getElementById('heroService').value;
+  const city = document.getElementById('heroCity').value;
+  if (service) document.getElementById('filterService').value = service;
+  if (city) document.getElementById('filterCity').value = city;
+  applyFilters();
+  scrollToSection('vendors');
+}
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+init();
+</script>
+</body>
+</html>
